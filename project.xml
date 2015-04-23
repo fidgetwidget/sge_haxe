@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="SgeHaxe" package="com.sample.project" version="1.0.0" company="Company Name" />
+	<app main="Main" path="Export" file="SgeHaxe" />
+
+	<window background="#ffffff" fps="100" />
+	<window width="1280" height="768" unless="mobile" />
+	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
+	
+	<source path="Source" />
+	
+	<haxelib name="openfl" />
+	<haxelib name="actuate" />
+	
+	<assets path="Assets" rename="assets" exclude="openfl.svg" />
+
+	<icon path="Assets/openfl.svg" />
+	
+</project>

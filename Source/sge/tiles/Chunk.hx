@@ -4,6 +4,7 @@ import openfl.display.Bitmap;
 import openfl.display.BitmapData;
 import openfl.display.Sprite;
 import openfl.geom.Point;
+import haxe.Log;
 import haxe.ds.Vector;
 
 
@@ -39,44 +40,51 @@ class Chunk extends Sprite
         throw new openfl.errors.Error("Chunk world not set.");
       }
       // Get the id from the world
-      xx = (xi * TILES.CHUNK_SIZE[0]) + x;
-      yy = (yi * TILES.CHUNK_SIZE[1]) + y;
+      _gtxx = (xi * TILES.CHUNK_SIZE[0]) + x;
+      _gtyy = (yi * TILES.CHUNK_SIZE[1]) + y;
 
-      if ( forceChunk || world.hasChunk(xx, yy) ) {
-        return world.getTile(xx, yy);  
+      if ( forceChunk || world.hasChunk(_gtxx, _gtyy) ) {
+
+        // Log.trace('outOfRange getTileId @ ${_gtxx} ${_gtyy}');
+        
+        return world.getTile(_gtxx, _gtyy);
       } else {
         return -1;
       }
     }
-    gti_index = getTileIndex(x, y);
-    return tiles[ gti_index ];
+    _gti_index = getTileIndex(x, y);
+    return tiles[ _gti_index ];
   }
+  private var _gtxx :Int;
+  private var _gtyy :Int;
+  private var _gti_index :Int;
 
 
   public function setTileId( x :Int, y :Int, value :Int ) :Int
   {
-    sti_index = getTileIndex(x, y);
+    _sti_index = getTileIndex(x, y);
 
-    if (tiles[ sti_index ] != value) {
-      tiles[ sti_index ] = value;
+    if (tiles[ _sti_index ] != value) {
+      tiles[ _sti_index ] = value;
       touchTile( x, y, true );
       return value;
     }
     return value;
   }
+  private var _sti_index :Int;
 
 
   public function touchTile( x :Int, y :Int, andNeighbors :Bool = false ) :Void 
   { 
     if ( outOfRange(x, y) ) { 
       // Get the id from the world
-      xx = (xi * TILES.CHUNK_SIZE[0]) + x;
-      yy = (yi * TILES.CHUNK_SIZE[1]) + y;
-      return world.touchTile(xx, yy);
+      _ttxx = (xi * TILES.CHUNK_SIZE[0]) + x;
+      _ttyy = (yi * TILES.CHUNK_SIZE[1]) + y;
+      return world.touchTile(_ttxx, _ttyy);
     }
 
-    tt_index = getTileIndex(x, y);
-    tileChanged[ tt_index ] = true;
+    _tt_index = getTileIndex(x, y);
+    tileChanged[ _tt_index ] = true;
 
     if (andNeighbors) {
       touchTile(x  , y-1);
@@ -89,24 +97,28 @@ class Chunk extends Sprite
       touchTile(x-1, y-1);
     }
   }
+  private var _ttxx :Int;
+  private var _ttyy :Int;
+  private var _tt_index :Int;
   
 
   public function getNeighborData( x :Int, y :Int, data :NeighborData = null ) :NeighborData
   {
-    type = getTileId(x, y);
+    _type = getTileId(x, y);
     if (data == null) { data = new NeighborData(); }
 
-    data.n  = ( getTileId(x  , y-1, false) == type ) ? 1 : 0;
-    data.ne = ( getTileId(x+1, y-1, false) == type ) ? 1 : 0;
-    data.e  = ( getTileId(x+1, y  , false) == type ) ? 1 : 0;
-    data.se = ( getTileId(x+1, y+1, false) == type ) ? 1 : 0;
-    data.s  = ( getTileId(x  , y+1, false) == type ) ? 1 : 0;
-    data.sw = ( getTileId(x-1, y+1, false) == type ) ? 1 : 0;
-    data.w  = ( getTileId(x-1, y  , false) == type ) ? 1 : 0;
-    data.nw = ( getTileId(x-1, y-1, false) == type ) ? 1 : 0;
+    data.n  = ( getTileId(x  , y-1, false) == _type ) ? 1 : 0;
+    data.ne = ( getTileId(x+1, y-1, false) == _type ) ? 1 : 0;
+    data.e  = ( getTileId(x+1, y  , false) == _type ) ? 1 : 0;
+    data.se = ( getTileId(x+1, y+1, false) == _type ) ? 1 : 0;
+    data.s  = ( getTileId(x  , y+1, false) == _type ) ? 1 : 0;
+    data.sw = ( getTileId(x-1, y+1, false) == _type ) ? 1 : 0;
+    data.w  = ( getTileId(x-1, y  , false) == _type ) ? 1 : 0;
+    data.nw = ( getTileId(x-1, y-1, false) == _type ) ? 1 : 0;
 
     return data;
   }
+  private var _type :Int;
   
 
   public function drawTiles() :Void
@@ -116,27 +128,30 @@ class Chunk extends Sprite
     {
       for (y in 0...TILES.CHUNK_SIZE[1]) 
       {
-        dt_index = getTileIndex( x, y );
+        _dt_index = getTileIndex( x, y );
 
-        if ( tileChanged[ dt_index ] == true ) 
+        if ( tileChanged[ _dt_index ] == true ) 
         {
           drawTile( x, y );
-          tileChanged[ dt_index ] = false;
+          tileChanged[ _dt_index ] = false;
         }
       }
     }
   }
+  private var _dt_index :Int;
 
 
   // Copy the bitmap data for the given tile to the Chunks Bitmap
   private function drawTile( x :Int, y :Int ) :Void
   {
     if (autotiler == null) { return; }
-    target = new Point(x * TILES.TILE_SIZE[0], y * TILES.TILE_SIZE[1]);
-    tile_id = getTileId(x, y);
-    autotiler.drawTileTo( tile_id, getNeighborData(x, y, nData), target, bitmap.bitmapData );
+    _dt_target = new Point(x * TILES.TILE_SIZE[0], y * TILES.TILE_SIZE[1]);
+    _tile_id = getTileId(x, y);
+    autotiler.drawTileTo( _tile_id, getNeighborData(x, y, _nData), _dt_target, bitmap.bitmapData );
   }
-  private var tile_id :Int;
+  private var _tile_id :Int;
+  private var _dt_target: Point;
+  private var _nData :NeighborData;
 
 
   public inline function getTileIndex( x :Int, y :Int ) :Int
@@ -165,17 +180,6 @@ class Chunk extends Sprite
   // chunk world coords
   private var xi :Int;
   private var yi :Int;
-
   private var bitmap :Bitmap;
-  // Memory Saving
-  private var dt_index :Int;
-  private var tt_index :Int;
-  private var gti_index :Int;
-  private var sti_index :Int;
-  private var type :Int;
-  private var xx :Int;
-  private var yy :Int;
-  private var target :Point;
-  private var nData :NeighborData;
 
 }

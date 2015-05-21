@@ -93,28 +93,28 @@ class AutotileTest extends WorldScene
     dirt.addChild( new Bitmap(frame.bitmapData) );
     dirt.x = tileSelector_getXOffset(0);
     dirt.y = 16;
-    dirt.addEventListener(MouseEvent.CLICK, onTileSelectorClick_dirt);
+    dirt.addEventListener(MouseEvent.CLICK, onTileSelectorClick);
 
     selectors.set('grass', grass);
     frame = world.autotiler.getCursorFrame(1);
     grass.addChild( new Bitmap(frame.bitmapData) );
     grass.x = tileSelector_getXOffset(1);
     grass.y = 16;
-    grass.addEventListener(MouseEvent.CLICK, onTileSelectorClick_grass);
+    grass.addEventListener(MouseEvent.CLICK, onTileSelectorClick);
     
     selectors.set('sand', sand);
     frame = world.autotiler.getCursorFrame(2);
     sand.addChild( new Bitmap(frame.bitmapData) );
     sand.x = tileSelector_getXOffset(2);
     sand.y = 16;
-    sand.addEventListener(MouseEvent.CLICK, onTileSelectorClick_sand);
+    sand.addEventListener(MouseEvent.CLICK, onTileSelectorClick);
         
     selectors.set('mud', mud);
     frame = world.autotiler.getCursorFrame(4);
     mud.addChild( new Bitmap(frame.bitmapData) );
     mud.x = tileSelector_getXOffset(3);
     mud.y = 16;
-    mud.addEventListener(MouseEvent.CLICK, onTileSelectorClick_mud);
+    mud.addEventListener(MouseEvent.CLICK, onTileSelectorClick);
 
     tileSelector.addChild(bg);
     tileSelector.addChild(dirt);
@@ -132,23 +132,23 @@ class AutotileTest extends WorldScene
   }
 
   private function onTileSelectorClick_dirt( e :MouseEvent ) :Void {
-    currentTileType = 0;
+    this.currentTileType = 0;
   }
   private function onTileSelectorClick_grass( e :MouseEvent ) :Void {
-    currentTileType = 1;
+    this.currentTileType = 1;
   }
   private function onTileSelectorClick_sand( e :MouseEvent ) :Void {
-    currentTileType = 2;
+    this.currentTileType = 2;
   }
   private function onTileSelectorClick_mud( e :MouseEvent ) :Void {
-    currentTileType = 4;
+    this.currentTileType = 4;
   }
 
   private function onTileSelectorClick( event :MouseEvent ) :Void
   {
+    haxe.Log.trace(event.toString());
     if (event.relatedObject == null) { return; }
     var target = event.relatedObject;
-    haxe.Log.trace(event.toString());
     currentTileType = world.autotiler.ids.get(target.name);
   }
 
@@ -186,7 +186,11 @@ class AutotileTest extends WorldScene
       if ( ! tileSelector.hitTestPoint(Mouse.x, Mouse.y) ) {
 
         tileId = getTileAt( Mouse.x, Mouse.y );
-        if (tileId != currentTileType) { setTileAt(Mouse.x, Mouse.y, currentTileType); }  
+        if (tileId != currentTileType) { 
+          Log.trace('x: ${Mouse.x} y: ${Mouse.y} id: ${currentTileType}');
+
+          setTileAt(Mouse.x, Mouse.y, currentTileType); 
+        }  
 
       }
 
@@ -195,6 +199,20 @@ class AutotileTest extends WorldScene
 
   private function updateCamera() :Void
   {
+
+    if (Keyboard.isDown( Key.NUMBER_0 )) {
+      this.currentTileType = 0;
+    }
+    if (Keyboard.isDown( Key.NUMBER_1 )) {
+      this.currentTileType = 1;
+    }
+    if (Keyboard.isDown( Key.NUMBER_2 )) {
+      this.currentTileType = 2;
+    }
+    if (Keyboard.isDown( Key.NUMBER_4 )) {
+      this.currentTileType = 4;
+    }
+
     if (Keyboard.isDown(Key.ARROW_UP))
     {
       this.y += 5;
@@ -231,9 +249,11 @@ class AutotileTest extends WorldScene
     cursor.y = yy * TILES.TILE_SIZE[1];
     tile_type = 0;
     tile_index = 0;
+    chunkId = world.getChunkId( world.getChunkX(xx), world.getChunkY(yy) );
 
-    coords.text = 'x: ${xx} y: ${yy} id: ${tile_index} type: ${tile_type}';
+    coords.text = 'x: ${xx} y: ${yy} id: ${tile_index} type: ${tile_type} cId: ${chunkId}';
   }
+  private var chunkId :String;
 
   private function get_currentTileType() :Int { return _currentTileType; }
   private function set_currentTileType( value :Int ) :Int { 

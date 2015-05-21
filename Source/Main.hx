@@ -42,12 +42,12 @@ class Main extends Sprite {
 			_debug = new Console();
 			Game.stage.addChild(_debug);
 
-			Game.console.log("Hash of the word String: "+sge.math.Random.shash("string"));
+			Game.console.log('Hash of the word String: ${sge.math.Random.shash("string")}');
 		}
 
-		var scene = new examples.PongTest();
+		var scene = new examples.AutotileTest();
 		game.addScene( scene );
-		game.pushScene("examples.PongTest");
+		game.pushScene("examples.AutotileTest");
 
 	}
 

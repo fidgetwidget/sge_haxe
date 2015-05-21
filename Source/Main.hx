@@ -45,9 +45,9 @@ class Main extends Sprite {
 			Game.console.log("Hash of the word String: "+sge.math.Random.shash("string"));
 		}
 
-		var scene = new examples.CollisionTest();
+		var scene = new examples.PongTest();
 		game.addScene( scene );
-		game.pushScene("examples.CollisionTest");
+		game.pushScene("examples.PongTest");
 
 	}
 

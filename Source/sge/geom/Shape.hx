@@ -47,14 +47,14 @@ class Shape implements IHasBounds
 
   public function debug_render( g :Graphics, scene :Scene ) :Void
   {
-    i = vertices.length - 1;
-    g.moveTo(scene.x + vertices[i].x, scene.y + vertices[i].y);
+    end_index = vertices.length - 1;
+    g.moveTo(scene.x + vertices[end_index].x, scene.y + vertices[end_index].y);
     for (point in vertices)
     {
       g.lineTo(scene.x + point.x, scene.y + point.y);
     }
   }
-  private var i :Int;
+  private var end_index :Int;
 
 
   private function get_vertices() :Vertices

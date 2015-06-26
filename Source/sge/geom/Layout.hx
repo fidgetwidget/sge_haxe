@@ -16,8 +16,6 @@ class Layout
 
   public static var ALIGN_STRETCH :Int = 3;
 
-
-
   public var parent :Dynamic;
   public var x(get, never) :Float;
   public var y(get, never) :Float;

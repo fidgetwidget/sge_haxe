@@ -1,6 +1,5 @@
 package sge;
 
-import sge.display.Console;
 import sge.entity.Entity;
 import sge.input.Joystick;
 import sge.input.Keyboard;
@@ -32,7 +31,6 @@ class Game {
   public static var stage(get, never) :Stage;
   public static var delta(get, never) :Float;
   public static var random(get, never) :Random;
-  public static var console(get, never) :Console;
   
   // Members
   public var _root :DisplayObject;
@@ -262,18 +260,6 @@ class Game {
       return Game.instance._random;
     }
     else 
-    {
-      return null;
-    }
-  }
-
-  private static function get_console() :Console
-  {
-    if (Console.instance != null)
-    {
-      return Console.instance;
-    }
-    else
     {
       return null;
     }

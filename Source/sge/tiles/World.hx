@@ -1,9 +1,9 @@
 package sge.tiles;
 
-import sge.scene.Scene;
+import openfl.display.Graphics;
 import openfl.display.Sprite;
 import haxe.Log;
-
+import sge.scene.Scene;
 
 class World
 {
@@ -12,13 +12,14 @@ class World
   public var autotiler :AutoTiler;
   public var scene :Scene;
   public var layer :Sprite;
-
+  public var collisionTypeIds :Map<Int, Bool>;
 
 
   public function new( scene :Scene ) 
   {
     chunks = new Map<String, Chunk>();
     layer = new Sprite();
+    collisionTypeIds = new Map<Int, Bool>();
     this.scene = scene;
     this.scene.addChild(layer);
   }
@@ -26,7 +27,7 @@ class World
 
   public function getTile( world_x :Int, world_y :Int ) :Int
   {
-    Log.trace('getTile @ ${world_x} ${world_y}');
+    // Log.trace('getTile @ ${world_x} ${world_y}');
     _gtchunk = getChunk( world_x, world_y, 'getTile' );
 
     if (_gtchunk == null) {
@@ -107,7 +108,7 @@ class World
 
   public function setChunk( world_x :Int, world_y :Int, chunk :Chunk ) :Void 
   {
-    Log.trace('setChunk @ ${world_x}_${world_y}');
+    // Log.trace('setChunk @ ${world_x}_${world_y}');
 
     chunk_x = getChunkX(world_x);
     chunk_y = getChunkY(world_y);
@@ -160,7 +161,10 @@ class World
     for (chunk in chunks) { chunk.drawTiles(); }
   }
 
-
+  public function debug_render( g :Graphics, scene :Scene ) :Void
+  {
+    for (chunk in chunks) { chunk.debug_render(g, scene); } 
+  }
 
   public inline function getChunkId( chunk_x :Int, chunk_y :Int ) :String 
   {

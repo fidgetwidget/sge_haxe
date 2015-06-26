@@ -28,7 +28,7 @@ class Scene extends Sprite implements IHasProperties
   public var isReady :Bool;
 
   
-  public function new( ?parent :Scene )
+  public function new( ?parent :Scene, ?name :String )
   {
     super();
     parentScene = parent;
@@ -41,7 +41,11 @@ class Scene extends Sprite implements IHasProperties
     isReady = false;
     
     // set the name from the class
-    name = Type.getClassName(Type.getClass(this));
+    if (name != null) {
+      this.name = name;
+    } else {
+      name = Type.getClassName(Type.getClass(this));
+    }
   }
 
   public function init() :Void

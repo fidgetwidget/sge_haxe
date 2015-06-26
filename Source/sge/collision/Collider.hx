@@ -53,8 +53,8 @@ class Collider
   }
 
 
-  private inline function get_x() :Float { return body.cx; }
-  private inline function get_y() :Float { return body.cy; }
+  private function get_x() :Float { return body.cx; }
+  private function get_y() :Float { return body.cy; }
 
   private function get_hw() :Float { return 0; }
   private function get_hh() :Float { return 0; }

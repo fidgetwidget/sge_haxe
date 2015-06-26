@@ -1,6 +1,8 @@
 package sge.collision;
 
 import openfl.geom.Point;
+import openfl.display.Graphics;
+import sge.scene.Scene;
 
 
 class AABB
@@ -42,7 +44,14 @@ class AABB
     return CollisionMath.aabb_aabb(this, aabb, collision);
   }
 
+  public function debug_render( g :Graphics, scene :Scene ) :Void
+  {
+    g.drawRect(scene.x + l, scene.y + t, width, height);
+  }
 
+  // 
+  // Static Factory Functions
+  // 
   public static function make(x, y, width, height) :AABB
   {
     var aabb = new AABB();
@@ -62,6 +71,9 @@ class AABB
     return aabb;
   }
 
+  // 
+  // Getters and Setters
+  // 
   private inline function get_x() :Float                  { return center.x - hw; }
   private inline function set_x(value:Float) :Float       { return center.x = value + hw; }
 

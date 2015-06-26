@@ -2,10 +2,14 @@ package sge.tiles;
 
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
+import openfl.display.Graphics;
 import openfl.display.Sprite;
 import openfl.geom.Point;
 import haxe.Log;
 import haxe.ds.Vector;
+import sge.collision.TileCollider;
+import sge.collision.TilesCollider;
+import sge.scene.Scene;
 
 
 class Chunk extends Sprite
@@ -15,7 +19,7 @@ class Chunk extends Sprite
   public var tileChanged :Vector<Bool>;
   public var autotiler :AutoTiler;
   public var world(get, set) :World;
-
+  public var collider :TilesCollider;
 
   public function new()
   {
@@ -28,6 +32,7 @@ class Chunk extends Sprite
 
   public function init()
   {
+    collider = new TilesCollider(this);
     for (index in 0...tileChanged.length) {
       tileChanged[index] = true;
     }
@@ -66,6 +71,7 @@ class Chunk extends Sprite
 
     if (tiles[ _sti_index ] != value) {
       tiles[ _sti_index ] = value;
+      updateCollider( x, y, _sti_index, value );
       touchTile( x, y, true );
       return value;
     }
@@ -153,6 +159,64 @@ class Chunk extends Sprite
   private var _dt_target: Point;
   private var _nData :NeighborData;
 
+
+  public function debug_render( g :Graphics, scene :Scene ) :Void
+  {
+    collider.debug_render(g, scene);
+  }
+
+
+  public function updateCollider( x :Int, y :Int, index :Int, value :Int ) :Void
+  {
+
+    if (world.collisionTypeIds.exists(value) && world.collisionTypeIds.get(value)) {
+
+      if (collider.collisionAreas.exists(index)) {
+        tbounds = collider.collisionAreas.get(index);
+      } else {
+        tbounds = new TileCollider();
+        tbounds.x = this.x + (TILES.TILE_WIDTH * x);
+        tbounds.y = this.y + (TILES.TILE_HEIGHT * y);
+        tbounds.width = TILES.TILE_WIDTH;
+        tbounds.height = TILES.TILE_HEIGHT;
+      }
+
+      tvalue = TileCollider.NONE;
+      
+      tn = getTileId(x  , y-1, false);
+      te = getTileId(x+1, y  , false);
+      ts = getTileId(x  , y+1, false);
+      tw = getTileId(x-1, y  , false);
+
+      if (!collider.collisionAreas.exists(tn) || collider.collisionAreas.get(tn) == null) {
+        tvalue &= TileCollider.DOWN;
+      }
+      if (!collider.collisionAreas.exists(te) || collider.collisionAreas.get(te) == null) {
+        tvalue &= TileCollider.LEFT;
+      }
+      if (!collider.collisionAreas.exists(ts) || collider.collisionAreas.get(ts) == null) {
+        tvalue &= TileCollider.UP;
+      }
+      if (!collider.collisionAreas.exists(tw) || collider.collisionAreas.get(tw) == null) {
+        tvalue &= TileCollider.RIGHT;
+      }
+      tbounds.directions = tvalue;
+
+      collider.collisionAreas.set( index, tbounds );
+
+    } else {
+
+      collider.collisionAreas.remove( index );
+
+    }
+
+  }
+  private var tbounds :TileCollider;
+  private var tvalue :Int;
+  private var tn :Int;
+  private var te :Int;
+  private var ts :Int;
+  private var tw :Int;
 
   public inline function getTileIndex( x :Int, y :Int ) :Int
   {

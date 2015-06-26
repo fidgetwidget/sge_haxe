@@ -1,7 +1,6 @@
 package examples;
 
 import sge.display.AssetManager;
-import sge.display.Console;
 import sge.display.FrameData;
 import sge.entity.EntityList;
 import sge.input.Keyboard;
@@ -93,6 +92,8 @@ class AutotileTest extends WorldScene
     dirt.addChild( new Bitmap(frame.bitmapData) );
     dirt.x = tileSelector_getXOffset(0);
     dirt.y = 16;
+    dirt.buttonMode = true;
+    dirt.name = 'dirt';
     dirt.addEventListener(MouseEvent.CLICK, onTileSelectorClick);
 
     selectors.set('grass', grass);
@@ -100,6 +101,8 @@ class AutotileTest extends WorldScene
     grass.addChild( new Bitmap(frame.bitmapData) );
     grass.x = tileSelector_getXOffset(1);
     grass.y = 16;
+    grass.buttonMode = true;
+    grass.name = 'grass';
     grass.addEventListener(MouseEvent.CLICK, onTileSelectorClick);
     
     selectors.set('sand', sand);
@@ -107,6 +110,8 @@ class AutotileTest extends WorldScene
     sand.addChild( new Bitmap(frame.bitmapData) );
     sand.x = tileSelector_getXOffset(2);
     sand.y = 16;
+    sand.buttonMode = true;
+    sand.name = 'sand';
     sand.addEventListener(MouseEvent.CLICK, onTileSelectorClick);
         
     selectors.set('mud', mud);
@@ -114,6 +119,8 @@ class AutotileTest extends WorldScene
     mud.addChild( new Bitmap(frame.bitmapData) );
     mud.x = tileSelector_getXOffset(3);
     mud.y = 16;
+    mud.buttonMode = true;
+    mud.name = 'mud';
     mud.addEventListener(MouseEvent.CLICK, onTileSelectorClick);
 
     tileSelector.addChild(bg);
@@ -131,25 +138,10 @@ class AutotileTest extends WorldScene
     return (32 * i) + (16 * (i + 1));
   }
 
-  private function onTileSelectorClick_dirt( e :MouseEvent ) :Void {
-    this.currentTileType = 0;
-  }
-  private function onTileSelectorClick_grass( e :MouseEvent ) :Void {
-    this.currentTileType = 1;
-  }
-  private function onTileSelectorClick_sand( e :MouseEvent ) :Void {
-    this.currentTileType = 2;
-  }
-  private function onTileSelectorClick_mud( e :MouseEvent ) :Void {
-    this.currentTileType = 4;
-  }
-
   private function onTileSelectorClick( event :MouseEvent ) :Void
   {
-    haxe.Log.trace(event.toString());
-    if (event.relatedObject == null) { return; }
-    var target = event.relatedObject;
-    currentTileType = world.autotiler.ids.get(target.name);
+    if (event.target == null) { return; }
+    currentTileType = world.autotiler.ids.get(event.target.name);
   }
 
   private function initCursor() :Void
@@ -213,20 +205,20 @@ class AutotileTest extends WorldScene
       this.currentTileType = 4;
     }
 
-    if (Keyboard.isDown(Key.ARROW_UP))
+    if (Keyboard.isDown(Key.ARROW_UP) || Keyboard.isDown(Key.W))
     {
       this.y += 5;
     }
-    else if (Keyboard.isDown(Key.ARROW_DOWN))
+    else if (Keyboard.isDown(Key.ARROW_DOWN)  || Keyboard.isDown(Key.S))
     {
       this.y -= 5;
     }
 
-    if (Keyboard.isDown(Key.ARROW_LEFT))
+    if (Keyboard.isDown(Key.ARROW_LEFT) || Keyboard.isDown(Key.A))
     {
       this.x += 5;
     }
-    else if (Keyboard.isDown(Key.ARROW_RIGHT))
+    else if (Keyboard.isDown(Key.ARROW_RIGHT) || Keyboard.isDown(Key.D))
     {
       this.x -= 5;
     }

@@ -118,14 +118,14 @@ class DrawCircles extends Scene
     var xx :Float;
     var yy :Float;
 
-    g.lineStyle(1, 0xff0000);
-    g.drawRect(this.x, this.y, Game.stage.stageWidth, Game.stage.stageHeight);
+    g.lineStyle( 1, 0xff0000 );
+    g.drawRect( this.x, this.y, Game.stage.stageWidth, Game.stage.stageHeight );
 
-    g.lineStyle(1, 0x00ff00);
-    entities.debug_render(g, this, true);
+    g.lineStyle( 1, 0x00ff00 );
+    entities.debug_render( g, this, true );
 
-    g.lineStyle(1, 0x0000ff);
-    entities.debug_render(g, this);
+    g.lineStyle( 1, 0x0000ff );
+    entities.debug_render( g, this );
 
     for (c in circles)
     {

@@ -1,12 +1,12 @@
 package;
 
-import sge.display.Console;
 import sge.Game;
 import openfl.display.FPS;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.Lib;
 import haxe.Log;
+import examples.AutotileTest in ExampleScene;
 
 
 class Main extends Sprite {
@@ -14,10 +14,9 @@ class Main extends Sprite {
 	var game :sge.Game;
 	var inited :Bool;
 	var debug :Bool = true;
-	var _debug :Console;
 	var _fps :FPS;
 
-	/** 
+	/**
 	 *  ENTRY POINT 
 	 */
 	function resize(e) 
@@ -38,16 +37,11 @@ class Main extends Sprite {
 		{
 			_fps = new FPS(10, 10, 0x000000);
 			Game.stage.addChild(_fps);
-			
-			_debug = new Console();
-			Game.stage.addChild(_debug);
-
-			Game.console.log('Hash of the word String: ${sge.math.Random.shash("string")}');
 		}
 
-		var scene = new examples.AutotileTest();
+		var scene = new ExampleScene(null, 'example');
 		game.addScene( scene );
-		game.pushScene("examples.AutotileTest");
+		game.pushScene("example");
 
 	}
 

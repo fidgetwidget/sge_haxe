@@ -10,11 +10,18 @@ class CollisionMath
   {
     switch (self.type)
     {
+      
       case "sge.collision.CircleCollider":
         return circle_contains( cast(self, CircleCollider), x, y );
+      
       case "sge.collision.BoxCollider":
-        return box_contains( cast(self, BoxCollider), x, y );
+        return box_contains(    cast(self, BoxCollider),    x, y );
+      
+      case "sge.collision.TilesCollider":
+        return tiles_contains(  cast(self, TilesCollider),  x, y );
+      
       // TODO: add PolyCollider
+      
     }
     return false;
   }
@@ -39,6 +46,9 @@ class CollisionMath
           case "sge.collision.BoxCollider":
             return circle_box(cast(self, CircleCollider), cast(other, BoxCollider), collision);
 
+          case "sge.collision.TilesCollider":
+            return circle_tiles(cast(self, CircleCollider), cast(other, TilesCollider), collision);
+
           // TODO: add PolyCollider
         }
 
@@ -53,10 +63,31 @@ class CollisionMath
           case "sge.collision.BoxCollider":
             return box_box(cast(self, BoxCollider), cast(other, BoxCollider), collision);
 
+          case "sge.collision.TilesCollider":
+            return box_tiles(cast(self, BoxCollider), cast(other, TilesCollider), collision);
+
+          // TODO: add PolyCollider
+        }
+
+      case "sge.collision.TilesCollider":
+
+        switch (other.type)
+        {
+          case "sge.collision.CircleCollider":
+            return tiles_circle(cast(self, TilesCollider), cast(other, CircleCollider), collision);
+
+          case "sge.collision.BoxCollider":
+            return tiles_box(cast(self, TilesCollider), cast(other, BoxCollider), collision);
+
+          case "sge.collision.TilesCollider":
+            throw new openfl.errors.Error('Tiles Tiles Collision not supported.');
+            return false;
+
           // TODO: add PolyCollider
         }
 
       // TODO: add PolyCollider
+      
     }
     return false;
   }
@@ -118,6 +149,20 @@ class CollisionMath
     }
     return false;
   }
+
+  public static function tiles_contains( tiles :TilesCollider, x :Float, y :Float ) :Bool
+  {
+    if (tiles.outerBounds.contains( x, y )) {
+
+      _bounds = tiles.getClosest( x, y );
+      if (_bounds != null) {
+        return _bounds.contains( x, y );
+      }
+
+    }
+    return false;
+  }
+  private static var _bounds :AABB;
 
   // public static function poly_contains( polyCollider :PolyCollider, x :Float, y :Float ) :Bool
   // {
@@ -213,7 +258,13 @@ class CollisionMath
     return false;
   }
 
+  public static function circle_tiles( cc :CircleCollider, tiles :TilesCollider, ?collision :Collision ) :Bool 
+  {
+    return false;
+  }
+
   // TODO: circle_poly()
+
 
   // ----- BOX & _ COLLISIONS -----
 
@@ -311,8 +362,29 @@ class CollisionMath
     return false;
   }
 
+  public static function box_tiles( box :BoxCollider, tiles :TilesCollider, ?collision :Collision ) :Bool 
+  {
+    return false;
+  }
+
   // TODO: box_poly()
   
+
+  // ----- TILES & _ COLLISIONS -----
+
+  public static function tiles_circle( tiles :TilesCollider, cc :CircleCollider, ?collision :Collision ) :Bool 
+  {
+    return false;
+  }
+
+  public static function tiles_box( tiles :TilesCollider, box :BoxCollider, ?collision :Collision ) :Bool 
+  {
+    return false;
+  }
+
+  // TODO: tiles_poly()
+
+
   // ----- POLY & _ COLLISIONS
   
   // TODO: poly_poly()
@@ -320,6 +392,9 @@ class CollisionMath
   // TODO: poly_circle()
 
   // TODO: poly_box()
+  
+  // TODO: poly_tiles()
+
 
   // ----- OTHER COLLISION HELPERS -----
 

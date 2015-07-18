@@ -1,7 +1,6 @@
 package examples;
 
 import sge.collision.AABB;
-import sge.display.Console;
 import sge.entity.Entity;
 import sge.entity.EntityGrid;
 import sge.input.Keyboard;

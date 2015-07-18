@@ -13,7 +13,6 @@ class AssetManager
   private static var spritesheetCache:Map<String, Spritesheet>;
   private static var tilesheetCache:Map<String, Tilesheet>;
 
-
   private static function init()
   {
     imageCache = new Map<String, BitmapData>();
@@ -24,7 +23,11 @@ class AssetManager
 
   public static function saveBitmap( source :Dynamic ) :Bool 
   {
+    var name :String,
+      data :BitmapData;
+
     if (imageCache == null) { init(); }
+
     name = Std.string(source);
     data = Assets.getBitmapData(source);
     
@@ -40,14 +43,15 @@ class AssetManager
   public static function getBitmap( source :Dynamic ) :BitmapData
   {
     if (imageCache == null) { init(); }
-    name = Std.string(source);
+
+    var name = Std.string(source);
     // if it already exists, just return it
     if (imageCache.exists(name)) {
       return imageCache.get(name);
     }
     
     // save and return the data result
-    data = Assets.getBitmapData(source);
+    var data = Assets.getBitmapData(source);
     if (data != null) {
       imageCache.set(name, data);
     }
@@ -55,18 +59,24 @@ class AssetManager
     return data;
   }
 
+  public static function saveSpritesheet( sheet :Spritesheet ) :Bool
+  {
+    return false;
+  }
+
   public static function getSpritesheet( name :String ) :Spritesheet
   {
     return null;
+  }
+
+  public static function saveTilesheet( name :String ) :Bool
+  {
+    return false;
   }
 
   public static function getTilesheet( name :String ) :Tilesheet
   {
     return null;
   }
-
-
-  private static var name :String;
-  private static var data :BitmapData;
 
 }

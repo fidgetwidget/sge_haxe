@@ -5,7 +5,7 @@ import sge.collision.BoxCollider;
 import sge.collision.CircleCollider;
 import sge.collision.Collision;
 import sge.collision.CollisionMath;
-import sge.display.Console;
+
 import sge.entity.Entity;
 import sge.entity.EntityGrid;
 import sge.input.Key;

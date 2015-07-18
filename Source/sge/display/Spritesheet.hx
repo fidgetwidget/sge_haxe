@@ -11,8 +11,13 @@ import sge.tiles.Tileset;
 class Spritesheet extends Tileset
 {
 
-  public var animations :Map<String, Animation>;
+  // super Properties: 
+  // 
+  // public var name :String;
+  // public var source(get, set) :BitmapData;
+  // public var frames :Array<FrameData>;
 
+  public var animations :Map<String, Animation>;
 
 
   public function new( source :Dynamic, frames :Array<FrameData> = null, animations :Map<String, Animation> = null )

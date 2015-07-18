@@ -12,6 +12,9 @@ import sge.scene.Scene;
 class EntityList extends EntityManager {
 
 
+  private var _entities :Array<Entity>;
+
+
   public function new() 
   {
     super();
@@ -55,7 +58,5 @@ class EntityList extends EntityManager {
   {
     return false;
   }
-
-  private var _entities :Array<Entity>;
 
 }

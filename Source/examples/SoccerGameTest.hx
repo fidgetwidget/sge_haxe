@@ -21,12 +21,12 @@ import openfl.geom.Point;
 import openfl.display.Graphics;
 
 
-class PongTest extends Scene
+class SoccerGameTest extends Scene
 {
 
   var ball :Entity;
-  var lpaddle :Entity;
-  var rpaddle :Entity;
+  var lGoal :SoccerGameGoal;
+  var rGoal :SoccerGameGoal;
   var BASE_BALL_SPEED :Int = 200;
   var speed :Int = 0;
 
@@ -49,36 +49,25 @@ class PongTest extends Scene
     ball.collider = new CircleCollider(ball, ball.height * 0.5);
     ball.set('color', 0x333333);
 
-    lpaddle = new Entity();
-    lpaddle.height = 160;
-    lpaddle.width = 20;
-    lpaddle.x = 30;
-    lpaddle.y = Game.stage.stageHeight * 0.5 - lpaddle.height * 0.5;
-    lpaddle.motion = new Motion();
-    lpaddle.motion.x_drag = 10;
-    lpaddle.motion.y_drag = 10;
-    lpaddle.collider = new BoxCollider(lpaddle, lpaddle.width, lpaddle.height);
-    lpaddle.set('color', 0x333333);
+    lGoal = new SoccerGameGoal(SoccerGameGoal.LEFT_SIDE);
+    lGoal.x = 30;
+    lGoal.y = Game.stage.stageHeight * 0.5 - lGoal.height * 0.5;
 
-    rpaddle = new Entity();
-    rpaddle.height = 160;
-    rpaddle.width = 20;
-    rpaddle.x = Game.stage.stageWidth - 30;
-    rpaddle.y = Game.stage.stageHeight * 0.5 - rpaddle.height * 0.5;
-    rpaddle.motion = new Motion();
-    rpaddle.motion.x_drag = 10;
-    rpaddle.motion.y_drag = 10;
-    rpaddle.collider = new BoxCollider(rpaddle, rpaddle.width, rpaddle.height);
-    rpaddle.set('color', 0x333333);
-
+    rGoal = new SoccerGameGoal(SoccerGameGoal.RIGHT_SIDE);
+    rGoal.x = Game.stage.stageWidth - 30 - rGoal.width;
+    rGoal.y = Game.stage.stageHeight * 0.5 - rGoal.height * 0.5;
+    
     addEntity(ball);
-    addEntity(lpaddle);
-    addEntity(rpaddle);
+    addEntity(lGoal);
+    addEntity(rGoal);
 
     g = Game.graphics;
 
     initBallPosition();
     initBallMotion();
+
+    lGoal.drawShape();
+    rGoal.drawShape();
   }
   private var g :Graphics;
 
@@ -109,8 +98,8 @@ class PongTest extends Scene
   {
 
     removeEntity(ball);
-    removeEntity(lpaddle);
-    removeEntity(rpaddle);
+    removeEntity(lGoal);
+    removeEntity(rGoal);
 
   }
 
@@ -130,8 +119,7 @@ class PongTest extends Scene
 
     if ( ball.collider.x < ball.collider.hw || 
          ball.collider.x + ball.collider.hw > Game.stage.stageWidth ) {
-      initBallPosition();
-      initBallMotion();
+      ball.motion.x_velocity *= -1 ;
     }
 
     if ( ball.collider.y < ball.collider.hh || 
@@ -139,23 +127,23 @@ class PongTest extends Scene
       ball.motion.y_velocity *= -1 ;
     }
     
-    if ( ball.collider.collide(lpaddle.collider, hit) ) {
-      ball.motion.x_velocity *= -1;
-    }
+    // if ( ball.collider.collide(lGoal.collider, hit) ) {
+    //   ball.motion.x_velocity *= -1;
+    // }
 
-    if ( ball.collider.collide(rpaddle.collider, hit) ) {
-      ball.motion.x_velocity *= -1; 
-    }
+    // if ( ball.collider.collide(rGoal.collider, hit) ) {
+    //   ball.motion.x_velocity *= -1; 
+    // }
 
-    if ( lpaddle.collider.y < lpaddle.collider.hh || 
-         lpaddle.collider.y + lpaddle.collider.hh > Game.stage.stageHeight ) {
-      lpaddle.motion.y_velocity *= -1;
-    }
+    // if ( lGoal.collider.y < lGoal.collider.hh || 
+    //      lGoal.collider.y + lGoal.collider.hh > Game.stage.stageHeight ) {
+    //   lGoal.motion.y_velocity *= -1;
+    // }
 
-    if ( rpaddle.collider.y < rpaddle.collider.hh || 
-         rpaddle.collider.y + rpaddle.collider.hh > Game.stage.stageHeight ) {
-      rpaddle.motion.y_velocity *= -1;
-    }
+    // if ( rGoal.collider.y < rGoal.collider.hh || 
+    //      rGoal.collider.y + rGoal.collider.hh > Game.stage.stageHeight ) {
+    //   rGoal.motion.y_velocity *= -1;
+    // }
 
   }
   private var dx :Float;
@@ -165,37 +153,9 @@ class PongTest extends Scene
 
   private function handleInput() :Void
   {
-    if (Keyboard.isDown(Key.W))
-    {
-      lpaddle.motion.y_acceleration = -5;
-    }
-    else if (Keyboard.isDown(Key.S))
-    {
-      lpaddle.motion.y_acceleration = 5;
-    }
-    else
-    {
-      lpaddle.motion.y_acceleration = 0;
-    }
 
-    if (Keyboard.isDown(Key.ARROW_UP))
-    {
-      rpaddle.motion.y_acceleration = -5;
-    }
-    else if (Keyboard.isDown(Key.ARROW_DOWN))
-    {
-      rpaddle.motion.y_acceleration = 5;
-    }
-    else 
-    {
-      rpaddle.motion.y_acceleration = 0;
-    } 
 
   }
-  private var _target_x :Int;
-  private var _target_y :Int;
-  private var _start_x :Float;
-  private var _start_y :Float;
 
 
   override public function render() :Void
@@ -207,8 +167,7 @@ class PongTest extends Scene
     entities.debug_render(g, this, true);
 
     g.lineStyle(1, 0x0000ff);
-    // entities.debug_render(g, this);
-    // 
+    entities.debug_render(g, this);
 
     color = ball.get('color');
     g.beginFill(color);
@@ -216,18 +175,6 @@ class PongTest extends Scene
     xx = (this.x + ball.x + ball.width * 0.5);
     yy = (this.y + ball.y + ball.height * 0.5);
     g.drawCircle(xx, yy, ball.width * 0.5);
-    g.endFill();
-
-    color = lpaddle.get('color');
-    g.beginFill(color);
-    g.lineStyle(1, color, 0.5);
-    g.drawRect(this.x + lpaddle.x, this.y + lpaddle.y, lpaddle.width, lpaddle.height);
-    g.endFill();
-
-    color = rpaddle.get('color');
-    g.beginFill(color);
-    g.lineStyle(1, color, 0.5);
-    g.drawRect(this.x + rpaddle.x, this.y + rpaddle.y, rpaddle.width, rpaddle.height);
     g.endFill();
 
   }

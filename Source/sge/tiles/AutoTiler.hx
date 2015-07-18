@@ -22,6 +22,16 @@ class AutoTiler extends Tileset
   public var ids   :Map<String, Int>;
 
 
+  private var partRect :Rectangle;
+  private var tileRect :Rectangle;
+  private var _0stateIndex :Map<String, Int>;
+  private var _4stateIndex :Map<String, Int>;
+
+  // memory saving (keep just the one of them)
+  private var destPoint :Point;
+  private var partsData :PartsData;
+
+
   public function new( source :Dynamic )
   {
     super(source);
@@ -34,11 +44,17 @@ class AutoTiler extends Tileset
     partRect = new Rectangle(0, 0, TILES.TILE_PART_SIZE[0], TILES.TILE_PART_SIZE[1]);
     _0stateIndex = new Map<String, Int>();
     _4stateIndex = new Map<String, Int>();
+
+    destPoint = null;
+    partsData = null;
   }
 
 
   public function addAutoTileFrames( tileId :Int, name :String, offset_x :Int, offset_y :Int ) :Void
   {
+    var id :Int,
+      frame :FrameData;
+
     names.set( tileId, name );
     ids.set( name, tileId );
     
@@ -71,8 +87,8 @@ class AutoTiler extends Tileset
 
   public function getCursorFrame( tileId :Int ) :FrameData
   {
-    _name = names[ tileId ];
-    return getPart('${_name}_00');
+    var name = names[ tileId ];
+    return getPart('${name}_00');
   }
 
 
@@ -81,6 +97,8 @@ class AutoTiler extends Tileset
   public function addTileFrame( name :String, offset_x :Int, offset_y :Int, state :Int ) :Void
   {
     if (state != 0 && state != 4) { return; }
+    var id :Int,
+      frame :FrameData;
     
     addFrame(offset_x, offset_y, TILES.TILE_WIDTH, TILES.TILE_HEIGHT);
     id = frames.length - 1;
@@ -101,27 +119,39 @@ class AutoTiler extends Tileset
 
   public function drawTileTo( tileId :Int, neighborData :NeighborData, target :Point, dest :BitmapData  ) :Void
   {
-    _name = names[ tileId ];
-    if (_name == null) { 
+    var name :String,
+      frame :FrameData;
+
+    name = names[ tileId ];
+    if (name == null) { 
       throw new openfl.errors.Error('the name for the tile draw request was null.');
       return;
     }
-    partsData = (neighborData == null ? null : getPartsData( neighborData, partsData ));
+
+    if ( neighborData == null ) {
+      partsData = null;
+    } else {
+      partsData = getPartsData( neighborData, partsData );
+    }
+
     if ( partsData == null || partsData.none ) {
       
-      frame = getPart( '${_name}_00' );
+      frame = getPart( '${name}_00' );
       dest.copyPixels( frame.bitmapData, tileRect, target );
 
-    } else if ( partsData.all && _4stateIndex[_name] > 0 ) {
+    } else if ( partsData.all && _4stateIndex[name] > 0 ) {
 
-      frame = getPart( '${_name}_40' );
+      frame = getPart( '${name}_40' );
       dest.copyPixels( frame.bitmapData, tileRect, target );
 
     } else {
 
+      var xx :Int,
+        yy :Int;
+
       // copy over the 4 parts
       for (q in 0...4) {
-        frame = getTilePart( _name, q );
+        frame = getTilePart( name, q, partsData );
         xx = Math.floor( target.x + (TILES.TILE_PART_OFFSET[0][q] * TILES.TILE_PART_SIZE[0]) );
         yy = Math.floor( target.y + (TILES.TILE_PART_OFFSET[1][q] * TILES.TILE_PART_SIZE[1]) );
         if (destPoint == null) { destPoint = new Point(); }
@@ -137,6 +167,8 @@ class AutoTiler extends Tileset
 
   private function getPart( name :String ) :FrameData
   {
+    var frame :FrameData;
+
     frame = parts[ name ];
     if (frame != null && frame.bitmapData == null) {
       generateBitmapData( frame );
@@ -147,6 +179,15 @@ class AutoTiler extends Tileset
 
   private function cachePartFrame( name :String, offset_x :Int, offset_y :Int, quad :Int, segment :Int ) :Void
   {
+    var _x :Int,
+      _y :Int,
+      dx :Int,
+      dy :Int,
+      xx :Int,
+      yy :Int,
+      id :Int,
+      frame :FrameData;
+
     _x = TILES.TILE_OFFSET[0][segment] * TILES.TILE_SIZE[0];
     _y = TILES.TILE_OFFSET[1][segment] * TILES.TILE_SIZE[1];
     dx = TILES.TILE_PART_OFFSET[0][quad] * TILES.TILE_PART_SIZE[0];
@@ -161,7 +202,7 @@ class AutoTiler extends Tileset
   }
 
 
-  private function getTilePart( name:String, quad :Int ) :FrameData
+  private function getTilePart( name:String, quad :Int, partsData :PartsData ) :FrameData
   {
     return getPart('${name}_${TILES.TILE_PART_LETTER[quad]}${TILES.TILE_PART_INDEX[quad][partsData.values[quad]]}');
   }
@@ -192,22 +233,5 @@ class AutoTiler extends Tileset
     }
     return results;
   }
-
-
-
-  private var id :Int;
-  private var _x :Int;
-  private var _y :Int;
-  private var dx :Int;
-  private var dy :Int;
-  private var xx :Int;
-  private var yy :Int;
-  private var _name :String;
-  private var partRect :Rectangle;
-  private var tileRect :Rectangle;
-  private var partsData :PartsData;
-  private var destPoint :Point;
-  private var _0stateIndex :Map<String, Int>;
-  private var _4stateIndex :Map<String, Int>;
 
 }

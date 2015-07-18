@@ -11,6 +11,18 @@ class AnimatedSprite extends FrameSprite
   public var current :Animation;
   public var onComplete :Dynamic; // callback function
 
+  private var animQueue :Array<Animation>;
+  private var animation :Animation;
+  private var animComplete :Bool;
+
+  private var timeElapsed :Int;
+  private var loopTime :Int;
+  private var ratio :Float;
+  private var frameCount :Int;
+  private var frameDuration :Int;
+  private var timeInAnim :Int;
+  private var rawFrameIndex :Int;
+  
 
   public function getFrameData( index :Int ) :Dynamic
   {
@@ -176,19 +188,5 @@ class AnimatedSprite extends FrameSprite
     bitmap.x = frame.center.x - current.center_x;
     bitmap.y = frame.center.y - current.center_x;
   }
-
-
-  private var animQueue :Array<Animation>;
-  private var animation :Animation;
-  private var animComplete :Bool;
-
-  private var timeElapsed :Int;
-  private var loopTime :Int;
-  private var ratio :Float;
-  private var frameCount :Int;
-  private var frameDuration :Int;
-  private var timeInAnim :Int;
-  private var rawFrameIndex :Int;
-
 
 }

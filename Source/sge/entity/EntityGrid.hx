@@ -10,22 +10,32 @@ import sge.scene.Scene;
 // EntityGrid
 // 
 // A grid space entity manager
-// allows for access to entitiy based on location
+// allows for access to entity based on location
 // 
 class EntityGrid extends EntityManager {
 
+  // TOOD: make the grid square width editable, 
+  //       and only use these as the defaults
   public static inline var GRID_SQUARE_WIDTH = 128;
   public static inline var GRID_SQUARE_HEIGHT = 128;
+  public static inline var COORD_DELIMITER = '_';
 
+  // these values shouldn't change once the grid is made... 
+  // so maybe make these private values instead
   public var grid_square_width :Int;
   public var grid_square_height :Int;
 
+  // entity access helpers
+  private var _entitiesById :Map<Int, Entity>;
+  private var _entitiesByGrid :Map<String, Array<Entity>>;
+  private var _allGridSquares :Array<String>;
+  private var _gridSquaresById :Map<Int, Array<String>>;
 
   public function new() 
   {
     super();
-    grid_square_width = EntityGrid.GRID_SQUARE_WIDTH;
-    grid_square_height = EntityGrid.GRID_SQUARE_HEIGHT;
+    grid_square_width = GRID_SQUARE_WIDTH;
+    grid_square_height = GRID_SQUARE_HEIGHT;
 
     _entitiesById = new Map<Int, Entity>();
     _entitiesByGrid = new Map<String, Array<Entity>>();
@@ -34,15 +44,16 @@ class EntityGrid extends EntityManager {
   }
 
 
+
   override public function update() :Void
   {
     // basic loop through and update all...
     for (e in _entitiesById)
     {
-      _wasInMotion = e.inMotion;
-      if (_wasInMotion) { removeFromGrid(e); }
+      var wasInMotion :Bool = e.inMotion;
+      if (wasInMotion) { removeFromGrid(e); }
       e.update();
-      if (_wasInMotion) { addToGrid(e); }
+      if (wasInMotion) { addToGrid(e); }
     }
   }
 
@@ -52,12 +63,17 @@ class EntityGrid extends EntityManager {
     {
       for (coord in _allGridSquares)
       {
-        _gc = coord.split('_');
-        xi = Std.parseInt(_gc[0]);
-        yi = Std.parseInt(_gc[1]);
+        var gridCoords :Array<String>,
+          xi :Int,
+          yi :Int,
+          length :Int;
 
-        _length = _entitiesByGrid.get(coord).length;
-        if (_length > 0)
+        gridCoords = coord.split(COORD_DELIMITER);
+        xi = Std.parseInt(gridCoords[0]);
+        yi = Std.parseInt(gridCoords[1]);
+        length = _entitiesByGrid.get(coord).length;
+
+        if (length > 0)
         {
           g.drawRect(scene.x + xi * grid_square_width, scene.y + yi * grid_square_height, grid_square_width, grid_square_height);  
         }
@@ -87,52 +103,56 @@ class EntityGrid extends EntityManager {
 
   override public function near( entity :Entity ) :Array<Entity>
   {
-    var results = new Array<Entity>();
-    _gridSquares = _gridSquaresById.get(entity.id);
+    var nearEntities :Array<Entity>,
+      gridSquares :Array<String>;
 
-    for (coord in _gridSquares)
+    nearEntities = new Array<Entity>();
+    gridSquares = _gridSquaresById.get(entity.id);
+
+    for (coord in gridSquares)
     {
-      _gc = coord.split('_');
-      xi = Std.parseInt(_gc[0]);
-      yi = Std.parseInt(_gc[1]);
+      var gridCoords :Array<String>,
+        xi :Int,
+        yi :Int,
+        entitiesInCoord :Array<Entity>;
 
-      _array = getAt(xi, yi);
-      results = _array.concat(results);
-      results.remove(entity);
+      gridCoords = coord.split(COORD_DELIMITER);
+      xi = Std.parseInt(gridCoords[0]);
+      yi = Std.parseInt(gridCoords[1]);
+      entitiesInCoord = getAt(xi, yi);
+
+      nearEntities = entitiesInCoord.concat(nearEntities);
+      nearEntities.remove(entity);
     }
-    return results;
+    return nearEntities;
   }
 
   override public function collision( entity :Entity, hits :Array<Collision> ) :Bool
   {
     // the entity in needs to have a collider
     if (entity.collider == null) { return false; }
+    var hit :Collision,
+      entitiesToCheck :Array<Entity>;
 
-    _hit = null;
-    _results = near(entity);
-    Game.console.log('near ${_results.length}');
+    hit = null;
+    entitiesToCheck = near(entity);
     // test all the entities near the given entity
-    while (_results.length > 0)
+    while (entitiesToCheck.length > 0)
     {
-      _entity = _results.pop();
+      var entityToCheck :Entity = entitiesToCheck.pop();
       // ignore entities that don't have a collider
-      if (_entity.collider == null) { continue; }
+      if (entityToCheck.collider == null) { continue; }
       // if we need a new collision data
-      if (_hit == null) { _hit = new Collision(); }
+      if (hit == null) { hit = new Collision(); }
       // test for collision
-      if (entity.collider.collide(_entity.collider, _hit))
+      if (entity.collider.collide(entityToCheck.collider, hit))
       {
-        hits.push(_hit);
-        _hit = null;
+        hits.push(hit);
+        hit = null;
       }
     }
     return hits.length > 0;
   }
-  private var _hit :Collision;
-  private var _entity :Entity;
-  private var _results :Array<Entity>;
-
-
 
 
   // ------------------------------
@@ -141,78 +161,86 @@ class EntityGrid extends EntityManager {
 
   private function addToGrid( entity :Entity ) :Void
   {
-    _aabb = entity.getBounds();
-    _t = Math.floor(_aabb.t / grid_square_height);
-    _l = Math.floor(_aabb.l / grid_square_width);
-    _b = Math.floor(_aabb.b / grid_square_height);
-    _r = Math.floor(_aabb.r / grid_square_width);
+    var bounds :AABB,
+      top :Int,
+      left :Int,
+      bottom :Int,
+      right :Int;
 
-    for (xi in _l..._r+1)
+    bounds = entity.getBounds();
+    top = Math.floor(bounds.t / grid_square_height);
+    left = Math.floor(bounds.l / grid_square_width);
+    bottom = Math.floor(bounds.b / grid_square_height);
+    right = Math.floor(bounds.r / grid_square_width);
+
+    for (xi in left...right+1)
     {
-      for (yi in _t..._b+1)
+      for (yi in top...bottom+1)
       {
-        _str = '${xi}_${yi}';
+        var gridCoord :String,
+          gridSquares :Array<String>,
+          entitiesInGrid :Array<Entity>;
+
+        gridCoord = coords(xi, yi);
         if (!_gridSquaresById.exists(entity.id)) {
           _gridSquaresById.set( entity.id, new Array<String>() );
         }
-        _gridSquares = _gridSquaresById.get(entity.id);
-        _gridSquares.push(_str);
+        gridSquares = _gridSquaresById.get(entity.id);
+        gridSquares.push(gridCoord);
 
-        if (!_entitiesByGrid.exists(_str)) { 
-          _entitiesByGrid.set( _str, new Array<Entity>() ); 
-          _allGridSquares.push(_str);
+        if (!_entitiesByGrid.exists(gridCoord)) { 
+          _entitiesByGrid.set( gridCoord, new Array<Entity>() ); 
+          _allGridSquares.push(gridCoord);
         }
-        _array = _entitiesByGrid.get(_str);
-        _array.push(entity);
+        
+        entitiesInGrid = _entitiesByGrid.get(gridCoord);
+        entitiesInGrid.push(entity);
       }
     }
   }
 
-  // Return the entities in a given entitiy grid square location
+  // Return the entities in a given entity grid square location
   private function getAt( x :Int, y :Int ) :Array<Entity>
   {
-    return _entitiesByGrid.get('${xi}_${yi}');
+    return _entitiesByGrid.get(coords(x, y));
   }
 
   private function removeFromGrid( entity :Entity ) :Void
   {
-    _aabb = entity.getBounds();
-    _t = Math.floor(_aabb.t / grid_square_height);
-    _l = Math.floor(_aabb.l / grid_square_width);
-    _b = Math.floor(_aabb.b / grid_square_height);
-    _r = Math.floor(_aabb.r / grid_square_width);
+    var bounds :AABB,
+      top :Int,
+      left :Int,
+      bottom :Int,
+      right :Int;
 
-    for (xi in _l..._r+1)
+    bounds = entity.getBounds();
+    top = Math.floor(bounds.t / grid_square_height);
+    left = Math.floor(bounds.l / grid_square_width);
+    bottom = Math.floor(bounds.b / grid_square_height);
+    right = Math.floor(bounds.r / grid_square_width);
+
+    for (xi in left...right+1)
     {
-      for (yi in _t..._b+1)
+      for (yi in top...bottom+1)
       {
-        _str = '${xi}_${yi}';
-        _gridSquares = _gridSquaresById.get(entity.id);
-        _gridSquares.remove(_str);
+        var gridCoord :String,
+          gridSquares :Array<String>,
+          entitiesInGrid :Array<Entity>;
 
-        if (!_entitiesByGrid.exists(_str)) { continue; }
-        _array = _entitiesByGrid.get(_str);
-        _array.remove(entity);
+        gridCoord = coords(xi, yi);
+        gridSquares = _gridSquaresById.get(entity.id);
+        gridSquares.remove(gridCoord);
+
+        if (!_entitiesByGrid.exists(gridCoord)) { continue; }
+        entitiesInGrid = _entitiesByGrid.get(gridCoord);
+        entitiesInGrid.remove(entity);
       }
     }
   }
 
-  private var _entitiesById :Map<Int, Entity>;
-  private var _entitiesByGrid :Map<String, Array<Entity>>;
-  private var _allGridSquares :Array<String>;
-  private var _gridSquares :Array<String>;
-  private var _gridSquaresById :Map<Int, Array<String>>;
-  private var _str :String;
-  private var _aabb :AABB;
-  private var _array :Array<Entity>;
-  private var _wasInMotion :Bool;
-  private var _t :Int;
-  private var _r :Int;
-  private var _b :Int;
-  private var _l :Int;
-  private var xi :Int;
-  private var yi :Int;
-  private var _gc :Array<String>;
-  private var _length :Int;
+  private function coords( xi :Int, yi :Int ) :String
+  {
+    return '${xi}${COORD_DELIMITER}${yi}';
+  }
 
 }

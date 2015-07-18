@@ -16,7 +16,7 @@ class Tileset
   public var frames :Array<FrameData>;
 
 
-
+  // TODO: force a name association somehow...
   public function new( source :Dynamic, frames :Array<FrameData> = null )
   {
     if (frames == null) {
@@ -40,7 +40,7 @@ class Tileset
   
   public function addFrame( x : Int, y : Int, width : Int, height : Int, center : Point = null ) : Void 
   {
-    rect = new Rectangle( x, y, width, height );
+    var rect = new Rectangle( x, y, width, height );
     addFrameRect( rect, center );
   } 
 
@@ -53,7 +53,7 @@ class Tileset
 
   public function getFrame( id :Int, ensureBitmapData :Bool = true ) :FrameData
   {
-    frame = frames[ id ];
+    var frame = frames[ id ];
     if (frame != null && frame.bitmapData == null && ensureBitmapData) {
       generateBitmapData( id );
     }
@@ -69,9 +69,14 @@ class Tileset
   }
 
   
-
+  // f: Dynamic[FrameData or Int]
   private function generateBitmapData( f :Dynamic ) :Void
   {
+    var bitmapData :BitmapData,
+      frame :FrameData,
+      rect :Rectangle,
+      target :Point;
+
     if (Std.is(f, FrameData)) {
       frame = f;
     } else {
@@ -99,10 +104,5 @@ class Tileset
   }
   private var _source :BitmapData;
 
-
-  private var bitmapData :BitmapData;
-  private var frame :FrameData;
-  private var rect :Rectangle;
-  private var target :Point;
 
 }

@@ -12,6 +12,7 @@
 	
 	<haxelib name="openfl" />
 	<haxelib name="actuate" />
+	<haxelib name="spritesheet" />
 	
 	<assets path="Assets" rename="assets" exclude="openfl.svg" />
 

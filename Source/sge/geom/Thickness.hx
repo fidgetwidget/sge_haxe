@@ -1,6 +1,11 @@
 package sge.geom;
 
 
+// 
+// Simple 4 side values 
+// 
+// useful for things like margin/padding storage
+// has a set function that works similar to css setter for margin/padding
 class Thickness
 {
 

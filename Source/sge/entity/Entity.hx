@@ -147,19 +147,16 @@ class Entity implements IHasBounds implements IHasProperties implements IHasPosi
   // IHasBounds
   // ------------------------------
   
-  private var _aabb :AABB;
-  private var _w :Float;
-  private var _h :Float;
-  
   public function getBounds() :AABB
   {
-    if (_aabb == null) { _aabb = new AABB(); }
-    _aabb.center.x  = cx;
-    _aabb.center.y  = cy;
-    _aabb.width     = width * scale_x;
-    _aabb.height    = height * scale_y;
-    return _aabb;
+    if (bounds == null) { bounds = new AABB(); }
+    bounds.center.x  = cx;
+    bounds.center.y  = cy;
+    bounds.width     = width * scale_x;
+    bounds.height    = height * scale_y;
+    return bounds;
   }
+  private var bounds :AABB;
   // ------------------------------
 
 }

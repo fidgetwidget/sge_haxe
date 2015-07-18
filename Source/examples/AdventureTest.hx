@@ -1,7 +1,6 @@
 package examples;
 
 import sge.display.AssetManager;
-import sge.display.Console;
 import sge.display.FrameData;
 import sge.entity.Entity;
 import sge.entity.EntityList;
@@ -65,6 +64,7 @@ class AdventureTest extends WorldScene
     AssetManager.saveBitmap('assets/images/autotiles.png');
     world.autotiler = new AutoTiler('assets/images/autotiles.png');
 
+    // Setup the tiles based on the autotiles.png file
     world.autotiler.addAutoTileFrames(0,  'dirt',       0,   0  );
     world.autotiler.addAutoTileFrames(1,  'grass',      64,  0  );
     world.autotiler.addAutoTileFrames(2,  'sand',       128, 0  );
@@ -74,6 +74,7 @@ class AdventureTest extends WorldScene
     world.autotiler.addAutoTileFrames(16, 'dirt_hole',  0,   192);
     world.autotiler.addAutoTileFrames(20, 'water',      256, 192);
 
+    // setup the collisions for each tile type defined above
     world.collisionTypeIds.set(0,  false);
     world.collisionTypeIds.set(1,  false);
     world.collisionTypeIds.set(2,  false);

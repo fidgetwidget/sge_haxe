@@ -16,21 +16,27 @@ class AnimationTest extends Scene
   override private function onReady() :Void 
   {
     //Load Spritesheet Source
-    var bitmap:BitmapData = Assets.getBitmapData("assets/kitTpArray.png");
+    var bitmap:BitmapData = Assets.getBitmapData("examples/animation/kit/kitTpArray.png");
 
     //Parse Spritesheet
-    var jsonString:String  = tempJson;
+    var jsonString:String  = Assets.getText("examples/animation/kit/kitTpArray.json");
     var tpParser = new TexturePackerImporter();
     tpParser.frameRate = 6;
 
     var exp:EReg = ~/.+(?=\/)/;
     
     var sheet:Spritesheet = tpParser.parse( jsonString, bitmap, exp );
+    
 
+    kit = new Entity();
     //tweak behaviors
     sheet.behaviors.get("idle").loop = true;
 
     animated = new AnimatedSprite(sheet, true);
+    kit.sprite = animated;
+
+    addEntity(kit);
+
     animated.showBehavior("idle");
     //animated.showBehaviors(["down","jump","hit","punch"]);
 
@@ -47,7 +53,7 @@ class AnimationTest extends Scene
     super.update();
     
     handleInput();
-    kit.update();
+    
 
   }
 

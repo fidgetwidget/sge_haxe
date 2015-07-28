@@ -6,10 +6,15 @@ import openfl.display.BitmapData;
 
 class AnimationLoader {
 
+
+
+
+
   public static function loadAnimationsFromJson( jsonString :String, bitmapData :BitmapData, format :FrameDataConverter ) :Array<Animation>
   {
 
     var json = haxe.Json.parse(jsonString);
+    
     var frames = new Array<FrameData>();
     var animations = new Array<Animation>();
 
